@@ -1,3 +1,3 @@
-# Version 0.1.0 - 29th February, 2024
+# Version 0.1.0 - 19 May, 2024
 
-Motorverse verifyAccount endpoint ready.
+Initial server version.

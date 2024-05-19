@@ -159,11 +159,5 @@ module.exports = function (sequelize) {
     ],
   });
 
-  User.associate = (models) => {
-    User.hasMany(models.Stake, {
-      foreignKey: 'userId',
-    });
-  };
-
   return User;
 };

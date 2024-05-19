@@ -48,7 +48,11 @@ process.on('SIGTERM', () => {
 
 basicDbSync().then(() => {
   formalDbMigrations().then(() => {
-    logger.info('Fully Connected to PostgreSQL');
+    if (config.db.sync === 'no-db') {
+      logger.info('Initialized with no connection to PostgreSQL');
+    } else {
+      logger.info('Fully Connected to PostgreSQL');
+    }
     server = app.listen(config.port, () => {
       logger.info(`Listening to port ${config.port}`);
     });

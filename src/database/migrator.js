@@ -29,6 +29,10 @@ async function formalDbMigrations() {
   try {
     logger.info('DB MIGRATIONS');
 
+    if (config.db.sync === 'no-db') {
+      return;
+    }
+
     logger.info('...calc pending');
     let resp = await umzug.pending();
     if (!resp || resp.length === 0) {
@@ -62,6 +66,8 @@ async function basicDbSync() {
       await sequelize.sync({ alter: true });
     } else if (config.db.sync === 'table') {
       await sequelize.sync({ alter: false });
+    } else if (config.db.sync === 'no-db') {
+      console.log("NO DATABASE INITIALIZATION");
     }
     logger.info('...POSTGRES SYNC DONE');
   } catch (e) {

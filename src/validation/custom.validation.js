@@ -50,12 +50,12 @@ const chain = (value, helpers) => {
   return value;
 };
 
-const walletType = (value, helpers) => {
+const filterByType = (value, helpers) => {
   if (!value && helpers.prefs.presence === 'optional') {
     return value;
   }
-  if (["ethereum"].indexOf(value.toLowerCase()) === -1) {
-    return helpers.message('Invalid wallet type');
+  if (["aldea"].indexOf(value.toLowerCase()) === -1) {
+    return helpers.message('Invalid filter by type');
   }
   return value;
 };
@@ -67,5 +67,5 @@ module.exports = {
   address,
   tokenType,
   chain,
-  walletType,
+  filterByType,
 };

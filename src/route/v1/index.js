@@ -5,6 +5,7 @@ const assetRoute = require("./asset.route");
 const walletRoute = require("./wallet.route");
 const healthCheckRoute = require('./healthCheck.route');
 const userRoute = require('./user.route');
+const spoRoute = require('./spo.route');
 const webhookRoute = require("./webhook.route");
 
 const defaultRoutes = [
@@ -15,6 +16,10 @@ const defaultRoutes = [
   {
     path: '/healthCheck',
     route: healthCheckRoute,
+  },
+  {
+    path: '/spos',
+    route: spoRoute,
   },
   {
     path: '/users',

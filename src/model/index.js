@@ -2,11 +2,7 @@ const { sequelize } = require('../database/connection');
 
 const models = {
   Asset: require('./Asset')(sequelize),
-  Campaign: require('./Campaign')(sequelize),
-  Cert: require('./Cert')(sequelize),
   Otp: require('./Otp')(sequelize),
-  PointsHistory: require('./PointsHistory')(sequelize),
-  Stake: require('./Stake')(sequelize),
   User: require('./User')(sequelize),
 };
 

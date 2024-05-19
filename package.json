@@ -44,6 +44,7 @@
     "prettier"
   ],
   "dependencies": {
+    "@blockfrost/blockfrost-js": "^5.5.0",
     "alchemy-sdk": "^3.2.0",
     "axios": "^1.4.0",
     "bignumber.js": "^9.1.2",

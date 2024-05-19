@@ -51,9 +51,8 @@ module.exports = {
   web3: {
     supportedChains: envVars.SUPPORTED_CHAINS.split(', '),
     networkRpcUrls: envVars.NETWORK_RPC_URLS.split(', '),
-    alchemy: {
-      apiKeys: envVars.ALCHEMY_API_KEYS.split(', '),
-      maxContractsPerCall: parseInt(envVars.ALCHEMY_MAX_CONTRACTS_PER_CALL),
+    blockfrost: {
+      apiKey: envVars.BLOCKFROST_API_KEY,
     },
   },
   redis: {
@@ -66,49 +65,7 @@ module.exports = {
   functionCodes: {
     master: envVars.CODE_MASTER,
   },
-  tmAnalyticsApi: {
-    baseUrl: envVars.TM_ANALYTICS_API_BASE_URL,
-    functionCodes: {
-      master: envVars.TM_ANALYTICS_API_CODE_MASTER,
-    },
-  },
-  b2c: {
-    tenantId: envVars.B2C_TENANT_ID,
-    tenantName: envVars.B2C_TENANT_NAME,
-    tenantDirId: envVars.B2C_TENANT_DIR_ID,
-  },
-  web3auth: {
-    jwksUrl: envVars.WEB3AUTH_JWKS_URL,
-    walletJwksUrl: envVars.WEB3AUTH_WALLET_JWKS_URL,
-  },
-  otp: {
-    expiration: envVars.OTP_EXPIRATION,
-  },
   jwt: {
     customSecret: envVars.CUSTOM_JWT_SECRET,
   },
-  moca: {
-    partnerId: envVars.MOCA_PARTNER_ID,
-    password: envVars.MOCA_PASSWORD,
-  },
-  points: {
-    staking: {
-      ethereum: {
-        contractAddress: envVars.ETHEREUM_STAKING_SMART_CONTRACT,
-      },
-      polygon: {
-        contractAddress: envVars.POLYGON_STAKING_SMART_CONTRACT,
-      },
-      confirmations: envVars.STAKING_BLOCK_CONFIRMATIONS,
-      depositedEvent: envVars.STAKING_DEPOSITED_EVENT,
-      withdrawnEvent: envVars.STAKING_WITHDRAWN_EVENT,
-      amount: envVars.STAKING_POINTS,
-    },
-    tier: {
-      bronze: envVars.BRONZE_TIER_THRESHOLD,
-      silver: envVars.SILVER_TIER_THRESHOLD,
-      gold: envVars.GOLD_TIER_THRESHOLD,
-      platinum: envVars.PLATINUM_TIER_THRESHOLD,
-    }
-  }
 };

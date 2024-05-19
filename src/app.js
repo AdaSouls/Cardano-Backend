@@ -57,7 +57,7 @@ app.get('/ip45v', (request, response) => response.send({ ip: request.ip, trustLe
 app.use(checkDown);
 
 // v1 api routes
-app.use('/v1', routesV1);
+app.use('/api/v1', routesV1);
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {

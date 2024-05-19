@@ -1,6 +1,5 @@
 const Joi = require('joi');
 const { address, chain, tokenType } = require('./custom.validation');
-const { gameId } = require('./game.validation')
 
 /*
 |--------------------------------------------------------------------------
@@ -23,7 +22,6 @@ const syncNftAsset = {
     internalContractId: Joi.number().optional().allow(null),
     startBlock: Joi.number().optional().allow(null),
     gameData: Joi.array().optional().allow(null).items(Joi.object().keys({
-      gameId: Joi.string().required().custom(gameId),
       tokenId: Joi.number().required(),
       assetId: Joi.string().required(),
     })),

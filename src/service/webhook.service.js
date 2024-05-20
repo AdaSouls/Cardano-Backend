@@ -1,9 +1,6 @@
-const { Web3 } = require("web3");
-const web3 = new Web3();
 const models = require("../model");
 const userService = require('../service/user.service');
 const config = require('../config/config');
-const points = require('../util/pointsMultiplier');
 
 const eventData = [
   {type: 'uint40', name: 'date'},
@@ -20,11 +17,11 @@ async function processEventLog (logs, chain) {
     if (logs[i].topics[0] === config.points.staking.depositedEvent) {
       // DEPOSITED EVENT
       const staker = "0x" + logs[i].topics[1].slice(26);
-      const decodedParameters = web3.eth.abi.decodeParameters(eventData, logs[i].data);
+      //const decodedParameters = web3.eth.abi.decodeParameters(eventData, logs[i].data);
       const date = decodedParameters[0];
       const poolIndex = decodedParameters[1];
       const depositIndex = decodedParameters[2];
-      const amount = web3.utils.fromWei(decodedParameters[3], "ether" );
+      //const amount = web3.utils.fromWei(decodedParameters[3], "ether" );
 
       // Get user id by external wallet
       let user = await userService.getUserByMotorverseOrExternalWallet(staker.toLowerCase());
@@ -80,9 +77,7 @@ async function processEventLog (logs, chain) {
       // Update user's points and add points history entry
       if (userId) {
 
-        let multipliers = await points.stakingPointsMultiplier(1, 30, amount.toString());
-        let calcMultiplier = points.reduceMultiplier(multipliers);
-        let pointsToAdd = Math.round(days * 0.001 * Number(amount) * calcMultiplier);
+        let pointsToAdd = 0;
 
         // Award points to user
         user.points = Number(user.points) + pointsToAdd;
@@ -113,11 +108,11 @@ async function processEventLog (logs, chain) {
     } else if (logs[i].topics[0] === config.points.staking.withdrawnEvent) {
       // WITHDRAWN EVENT
       const staker = "0x" + logs[i].topics[1].slice(26);
-      const decodedParameters = web3.eth.abi.decodeParameters(eventData, logs[i].data);
+      //const decodedParameters = web3.eth.abi.decodeParameters(eventData, logs[i].data);
       const date = decodedParameters[0];
       const poolIndex = decodedParameters[1];
       const depositIndex = decodedParameters[2];
-      const amount = web3.utils.fromWei(decodedParameters[3], "ether" );
+      //const amount = web3.utils.fromWei(decodedParameters[3], "ether" );
 
       // Get user id by external wallet
       let user = await userService.getUserByMotorverseOrExternalWallet(staker.toLowerCase());

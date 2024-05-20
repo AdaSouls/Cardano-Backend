@@ -14,7 +14,6 @@ module.exports = {
 
 const config = require("../config/config");
 const errorService = require("./error.service");
-const alchemyService = require("./alchemy.service");
 const redisService = require("./redis.service");
 const userService = require("./user.service");
 
@@ -100,19 +99,6 @@ async function processWeb3(allData, address, forceRefresh, method) {
 
   if (!fromCacheNft) {
     switch (method) {
-      case "alchemy":
-        console.log(alchemyService);
-        resp = await alchemyService.getWalletContents(address);
-        if (resp === false) {
-          return null;
-        }
-        //newData = resp.data;
-        newData = resp.assets;
-        //newCurrencies = resp.currencies;
-        console.log('ALCHEMY NEW DATA', address, newData);
-        timing = resp.timing;
-        break;
-
       default:
         errorService.stashBadRequest(`Invalid method: ${method}.`);
         return false;

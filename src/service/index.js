@@ -1,4 +1,3 @@
-module.exports.alchemyService = require('./alchemy.service');
 module.exports.assetService = require('./asset.service');
 module.exports.authService = require('./auth.service');
 module.exports.codeService = require('./code.service');

@@ -1,7 +1,6 @@
 const httpStatus = require("http-status");
 const catchAsync = require("../util/catchAsync");
 const webhookService = require('../service/webhook.service');
-const alchemyService = require('../service/alchemy.service');
 const config = require('../config/config');
 
 const stakingEvent = catchAsync(async (req, res) => {

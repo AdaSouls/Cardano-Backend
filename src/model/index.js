@@ -3,6 +3,7 @@ const { sequelize } = require('../database/connection');
 const models = {
   Asset: require('./Asset')(sequelize),
   Otp: require('./Otp')(sequelize),
+  Soulbound: require('./Soulbound')(sequelize),
   User: require('./User')(sequelize),
 };
 

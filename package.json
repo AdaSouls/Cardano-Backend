@@ -1,12 +1,8 @@
 {
-  "name": "mv-user-api",
+  "name": "Cardano-Backend",
   "version": "1.0.0",
-  "description": "Motorverse User API Server",
+  "description": "AdaSouls Cardano Backend",
   "main": "src/index.js",
-  "engines": {
-    "node": "20.x",
-    "npm": "10.x"
-  },
   "scripts": {
     "start": "pm2 start ecosystem.config.json --no-daemon",
     "dev": "cross-env NODE_ENV=local nodemon src/index.js",
@@ -24,28 +20,17 @@
   "keywords": [
     "node",
     "node.js",
-    "boilerplate",
-    "generator",
+    "cardano",
+    "backend",
     "express",
     "rest",
     "api",
-    "mongodb",
-    "mongoose",
-    "es6",
-    "es7",
-    "es8",
-    "es9",
-    "jest",
-    "travis",
-    "docker",
-    "passport",
-    "joi",
-    "eslint",
-    "prettier"
+    "postgres",
+    "jwt",
+    "blockfrost"
   ],
   "dependencies": {
     "@blockfrost/blockfrost-js": "^5.5.0",
-    "alchemy-sdk": "^3.2.0",
     "axios": "^1.4.0",
     "bignumber.js": "^9.1.2",
     "compression": "^1.7.4",

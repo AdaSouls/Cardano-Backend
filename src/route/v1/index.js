@@ -2,16 +2,26 @@ const express = require('express');
 const router = express.Router();
 const config = require('../../config/config');
 const assetRoute = require("./asset.route");
+const adminRoute = require("./admin.route");
 const walletRoute = require("./wallet.route");
 const healthCheckRoute = require('./healthCheck.route');
 const userRoute = require('./user.route');
 const spoRoute = require('./spo.route');
+const soulboundRoute = require('./soulbound.route');
 const webhookRoute = require("./webhook.route");
 
 const defaultRoutes = [
   {
+    path: "/admin",
+    route: adminRoute,
+  },
+  {
     path: "/asset",
     route: assetRoute,
+  },
+  {
+    path: "/soulbound",
+    route: soulboundRoute,
   },
   {
     path: '/healthCheck',

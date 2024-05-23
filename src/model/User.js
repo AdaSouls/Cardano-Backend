@@ -11,8 +11,9 @@ module.exports = function (sequelize) {
       let resp = {
         userId: this.userId,
         email: this.email,
-        name: this.name,
+        username: this.username,
         wallet: this.wallet,
+        stakeAddress: this.stakeAddress,
         roles: this.roles,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
@@ -39,13 +40,17 @@ module.exports = function (sequelize) {
       defaultValue: Sequelize.literal("gen_random_uuid()"),
       allowNull: false,
     },
-    email: {
+    stakeAddress: {
       type: DataTypes.STRING(100),
       allowNull: false,
     },
-    name: {
+    email: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    username: {
       type: DataTypes.STRING(50),
-      allowNull: false,
+      allowNull: true,
     },
     wallet: {
       type: DataTypes.JSONB,
@@ -61,9 +66,14 @@ module.exports = function (sequelize) {
     tableName: 'users',
     indexes: [
       {
-        name: 'users_userid',
+        name: 'users_userId',
         unique: true,
         fields: ['userId'],
+      },
+      {
+        name: 'users_stakeAddress',
+        unique: true,
+        fields: ['stakeAddress'],
       },
       // it seems counter-intuitive to not make email unique, but we don't have to worry as b2c enforces
       // it, and we could have a situation where an entry in our database no longer exists on b2c etc etc
@@ -71,11 +81,21 @@ module.exports = function (sequelize) {
         name: 'users_email',
         unique: true,
         fields: [fn('lower', col('email'))],
+        where: {
+          email: {
+            [Op.ne]: null
+          }
+        },
       },
       {
-        name: 'users_name',
-        unique: false,
-        fields: [fn('lower', col('name'))],
+        name: 'users_username',
+        unique: true,
+        fields: [fn('lower', col('username'))],
+        where: {
+          username: {
+            [Op.ne]: null
+          }
+        },
       },
     ],
   });

@@ -1,22 +1,117 @@
 const models = require('../model');
+const authService = require('./auth.service');
 const errorService = require('./error.service');
-const certService = require('./cert.service');
 const config = require('../config/config');
 const dicewareWord = require('diceware-word');
-const jose = require('jose');
-const jwt = require("jsonwebtoken");
-const fs = require("fs");
-const path = require("path");
 const { Op } = require('sequelize');
+const { Buffer } = require("buffer");
+const { COSESign1, COSEKey, BigNum, Label, Int } = require("@emurgo/cardano-message-signing-nodejs");
+const { Ed25519Signature, RewardAddress, PublicKey, Address, BaseAddress } = require("@emurgo/cardano-serialization-lib-nodejs");
 
 /**
- * Get user by mvAuthKey.
+ * Authenticate a user using a signed message by a Cardano wallet.
  *
- * @param {string} mvAuthKey
+ * @param {Object} signedData
  * @returns {Object}
  */
-const getUserByMvAuthKey = async (mvAuthKey) => {
-  let user = await models.User.findOne({ where: { mvAuthKey: mvAuthKey.toLowerCase() }});
+const userLogin = async (signedData, email = null, username = null) => {
+
+  try {
+    const decoded = COSESign1.from_bytes( Buffer.from(signedData.signature, "hex") );
+    const headermap = decoded.headers().protected().deserialized_headers();
+    const addressHex = Buffer.from( headermap.header( Label.new_text("address") ).to_bytes() )
+        .toString("hex")
+        .substring(4);
+    const address = Address.from_bytes( Buffer.from(addressHex, "hex") );
+    const baseAddress = BaseAddress.from_address(address);
+    const stakeCred = baseAddress.stake_cred();
+    const rewardAddressBytes = new Uint8Array(29);
+    rewardAddressBytes.set([0xe1], 0);
+    rewardAddressBytes.set(stakeCred.to_bytes().slice(4, 32), 1);
+
+    const key = COSEKey.from_bytes( Buffer.from(signedData.key, "hex") );
+    const pubKeyBytes = key.header( Label.new_int( Int.new_negative(BigNum.from_str("2")) ) ).as_bytes();
+    const publicKey = PublicKey.from_bytes(pubKeyBytes);
+
+    const payload = decoded.payload();
+    const signature = Ed25519Signature.from_bytes(decoded.signature());
+    const receivedData = decoded.signed_data().to_bytes();
+
+    //const signerStakeAddrBech32 = RewardAddress.from_address(address).to_address().to_bech32();
+    const signerStakeAddrBech32 = RewardAddress.from_address(Address.from_bytes(rewardAddressBytes)).to_address().to_bech32();
+
+    const utf8Payload = Buffer.from(payload).toString("utf8");
+    const expectedPayload = `account: ${signerStakeAddrBech32}`; // reconstructed message
+
+    // verify:
+    const isVerified = publicKey.verify(receivedData, signature);
+    const payloadAsExpected = utf8Payload == expectedPayload;
+    //const signerIsRegistered = registeredUsers.includes(signerStakeAddrBech32);
+
+    //const isAuthSuccess = isVerified && payloadAsExpected && signerIsRegistered;
+    const isAuthSuccess = isVerified && payloadAsExpected;
+
+    if(isAuthSuccess) {
+      // The wallet authentication is valid, I have to get a user from the users db
+      let user = await getUserByStakeAddress(signerStakeAddrBech32);
+
+      if (!user) {
+        // The user is new, add user to database
+        const userPayload = {
+          email: email == null ? "" : email,
+          username: username == null ? "" : username,
+          wallet: {
+            type: "cardano",
+            address: baseAddress.to_address().to_bech32(),
+          },
+          stakeAddress: signerStakeAddrBech32,
+          roles: [],
+        };
+
+        user = await models.User.create(userPayload);
+
+        if (!user) {
+          console.log('...error creating new user');
+          errorService.stashNotFound('Error creating new user in database', 'db-error');
+          return false;
+        }
+      }
+
+      // I have an user, I retrieve a valid JWT for the session
+      const token = authService.generateJwt(user.userId);
+
+      if (!token) {
+        return {
+          token: "jwt generation failed"
+        };
+      }
+
+      return {
+        user: user,
+        token
+      }
+
+    } else {
+      // The cardano wallet authentication failed
+      return {
+        token: "signature failed"
+      };
+    }
+  } catch (error) {
+    console.log("Svc:Users:userLogin error", error);
+    errorService.stashInternalErrorFromException(error, "Svc:Users:userLogin: ");
+    return false;
+  }
+};
+
+/**
+ * Get user by cardano stake address.
+ *
+ * @param {string} stakeAddress
+ * @returns {Object}
+ */
+const getUserByStakeAddress = async (stakeAddress) => {
+  let user = await models.User.findOne({ where: { stakeAddress: stakeAddress.toLowerCase() }});
   return user;
 };
 
@@ -151,92 +246,6 @@ const updateUserStake = async (wallet, withdrawTransactionHash, poolIndex, depos
 
   return { number, stakes };
 };
-
-/**
- * Verify user account depending on the source. We need to do the following:
- *
- * 1. Make sure we have a synced record for the user account.
- * 2. If we do, we retrieve the user data
- * 3. If we don't, we create a user record
- *
- * @param {object} data
- * @returns {Object}
- */
-const verifyAccount = async (data, jwtDecoded, wallet = null) => {
-
-  let user;
-
-  if (wallet) {
-    wallet.address = wallet.address.toLowerCase();
-  }
-
-  // Try to get the user from the database
-  if (data.source === "mv") {
-    // The verification comes from the motorverse hub
-    user = await getUserByMvAuthKey(
-      jwtDecoded.payload.wallets[0].public_key?.toLowerCase() ||
-      jwtDecoded.payload.wallets[0].address?.toLowerCase()
-      );
-
-    if (!user) {
-
-      // No user by key, let's try by wallet:
-      if (wallet) {
-        user = await getUserByMotorverseOrExternalWallet(wallet.address)
-        console.log(user);
-
-        if (user) {
-          console.log('....error creating new user!');
-          errorService.stashNotFound('Wallet linked to another user', 'wallet-linked');
-          return false;
-        }
-      }
-
-      const userPayload = {
-        mvAuthKey: jwtDecoded.payload.wallets[0].public_key?.toLowerCase() || jwtDecoded.payload.wallets[0].address?.toLowerCase(),
-        mvAuthType: jwtDecoded.payload.verifier || "wallet",
-        email: jwtDecoded.payload.email || "",
-        name: jwtDecoded.payload.name || "",
-        smartWallet: null,
-        embeddedWallet: null,
-        wallet: {
-          mv: wallet,
-        },
-        linkedGames: {},
-      };
-
-      user = await models.User.create(userPayload);
-
-      if (!user) {
-        console.log('....error creating new user!');
-        errorService.stashNotFound('User not found', 'not-found');
-        return false;
-      }
-    }
-  } else {
-    // The verification comes from the games
-    // If this happens, I have to look for the session ID in the linkedGames JSONB field
-
-    user = await models.User.findOne({
-      where: {
-        linkedGames: {
-          [data.source]: {
-            userId: jwtDecoded.sub
-          }
-        }
-      }
-    })
-
-    if (!user) {
-      console.log(`....error fetching the user for game ${data.source}!`);
-      errorService.stashNotFound('User not found for game', 'not-found');
-      return false;
-    }
-
-  }
-
-  return user;
-}
 
 /**
  * Generate OTP for a particular game. We need to do the following:
@@ -495,282 +504,8 @@ const getUniquePassphrase = async () => {
 
 };
 
-/**
- * Generate OTP for a particular game. We need to do the following:
- *
- * 1. Verify that the userId is valid
- * 2. Create a passphrase against that game (expiring in 1 hour from now)
- * 3. Save record to OTP dabatase
- * 4. Retrieve passphrase
- *
- * @param {string} userId
- * @param {object} data
- * @returns {Object}
- */
-const generateCustomJwt = async (body) => {
-
-  const secret = new TextEncoder().encode(
-    config.jwt.customSecret,
-  )
-
-  const alg = 'HS256'
-
-  const jwt = await new jose.SignJWT(body)
-    .setProtectedHeader({ alg })
-    .setIssuedAt()
-    .setIssuer(body.gameId)
-    .setAudience(`${body.gameId}:motorverse`)
-    .setExpirationTime('1h')
-    .sign(secret)
-
-  return jwt;
-
-}
-
-/**
- * Generate Mocaverse jwt.
- */
-const generateMocaverseJwt = async (body) => {
-
-  body.partnerId = config.moca.partnerId;
-
-  let partnerPrivateKey;
-
-  if (config.env === 'local') {
-    partnerPrivateKey = fs.readFileSync(
-      path.resolve(__dirname, '../certs/motorverse.key'),
-      'utf8',
-    );
-  } else {
-    // Get the private key from the certs table
-    let cert = await certService.getCertByCertType("mocaverse");
-    const decrypted = certService.decrypt(cert.value, config.moca.password);
-    partnerPrivateKey = decrypted;
-  }
-
-  const token = jwt.sign(body, partnerPrivateKey, {
-    expiresIn: '1h',
-    algorithm: 'RS256',
-  });
-
-  return token;
-
-}
-
-/**
- * Adds points to a user:
- *
- * 1. Make sure we have a synced record for the user account.
- * 2. If we do, we add points to that user and retrieve the user data
- * 3. If we don't, we give an error
- *
- * @param {object} data
- * @returns {Object}
- */
-const redeemUserPoints = async (data, jwtDecoded) => {
-
-  let user;
-
-  // Try to get the user from the database
-  if (data.source === "mv") {
-    // The verification comes from the motorverse hub
-    user = await getUserByMvAuthKey(
-      jwtDecoded.payload.wallets[0].public_key?.toLowerCase() ||
-      jwtDecoded.payload.wallets[0].address?.toLowerCase()
-      );
-
-    if (!user) {
-      console.log('....error fetching the user!');
-      errorService.stashNotFound('User not found', 'not-found');
-      return false;
-    } else {
-      // User found, check amount of points
-      let { pointsToRedeem } = data;
-
-      if (user.dataValues.points < pointsToRedeem) {
-        console.log('....amount of points to redeem is higher than actual points!');
-        errorService.stashForbidden('Not enough points', 'not-enough-points');
-        return false;
-      } else {
-        console.log("puntos para redeem: ", pointsToRedeem);
-        console.log("puntos actuales: ", user.points);
-        user.points = user.points - pointsToRedeem;
-        console.log("nuevos puntos antes de grabar: ", user.points);
-        console.log("tier antes de grabar: ", user.tier);
-        await user.save();
-        console.log("tier despues de grabar: ", user.tier);
-
-        const pointsHistoryPayload = {
-          eventType: "redeem",
-          timeframe: 0,
-          amountStaked: "0",
-          campaignNumber: 1,
-          points: pointsToRedeem,
-          multipliers: {},
-          pointsAwarded: -pointsToRedeem,
-          userId: user.dataValues.id,
-          status: "redeemed",
-        }
-
-        let newPointHistory = await models.PointsHistory.create(pointsHistoryPayload);
-
-        if (!newPointHistory) {
-          console.log('....error saving points history');
-          errorService.stashNotFound('PointsHistory failed', 'failed');
-          return false;
-        }
-
-      }
-    }
-  } else {
-    console.log('....call only possible from the motorverse hub!');
-    errorService.stashNotFound('Action not permitted', 'not-permitted');
-    return false;
-  }
-
-  return user;
-}
-
-/**
- * Gets the history of points from a user:
- *
- * 1. Make sure we have a synced record for the user account.
- * 2. If we do, we add points to that user and retrieve the user data
- * 3. If we don't, we give an error
- *
- * @param {object} data
- * @returns {Object}
- */
-const getUserPointsHistory = async (data, jwtDecoded) => {
-
-  let user, pointsHistory;
-
-  // Try to get the user from the database
-  if (data.source === "mv") {
-    // The verification comes from the motorverse hub
-    user = await getUserByMvAuthKey(
-      jwtDecoded.payload.wallets[0].public_key?.toLowerCase() ||
-      jwtDecoded.payload.wallets[0].address?.toLowerCase()
-      );
-
-    if (!user) {
-      console.log('....error fetching the user!');
-      errorService.stashNotFound('User not found', 'not-found');
-      return false;
-    }
-
-    pointsHistory = await getUserPointsByUserId(user.dataValues.id);
-
-  } else {
-    console.log('....call only possible from the motorverse hub!');
-    errorService.stashNotFound('Action not permitted', 'not-permitted');
-    return false;
-  }
-
-  return pointsHistory;
-}
-
-/**
- * Gets points from a user:
- *
- * 1. Make sure we have a synced record for the user account.
- * 2. If we do, we add points to that user and retrieve the user data
- * 3. If we don't, we give an error
- *
- * @param {object} data
- * @returns {Object}
- */
-const getUserPoints = async (data, jwtDecoded) => {
-
-  let user;
-
-  // Try to get the user from the database
-  if (data.source === "mv") {
-    // The verification comes from the motorverse hub
-    user = await getUserByMvAuthKey(
-      jwtDecoded.payload.wallets[0].public_key?.toLowerCase() ||
-      jwtDecoded.payload.wallets[0].address?.toLowerCase()
-      );
-
-    if (!user) {
-      console.log('....error fetching the user!');
-      errorService.stashNotFound('User not found', 'not-found');
-      return false;
-    }
-
-  } else {
-    console.log('....call only possible from the motorverse hub!');
-    errorService.stashNotFound('Action not permitted', 'not-permitted');
-    return false;
-  }
-
-  return {
-    id: user.dataValues.id,
-    userId: user.dataValues.userId,
-    mvAuthKey: user.dataValues.mvAuthKey,
-    points: user.dataValues.points,
-    tier: user.dataValues.tier,
-  };
-}
-
-/**
- * Gets stakes from a user:
- *
- * 1. Make sure we have a synced record for the user account.
- * 2. If we do, we add points to that user and retrieve the user data
- * 3. If we don't, we give an error
- *
- * @param {object} data
- * @returns {Object}
- */
-const getUserStakes = async (data, jwtDecoded) => {
-
-  let user, stakes;
-
-  // Try to get the user from the database
-  if (data.source === "mv") {
-    // The verification comes from the motorverse hub
-    user = await getUserByMvAuthKey(
-      jwtDecoded.payload.wallets[0].public_key?.toLowerCase() ||
-      jwtDecoded.payload.wallets[0].address?.toLowerCase()
-      );
-
-    if (!user) {
-      console.log('....error fetching the user!');
-      errorService.stashNotFound('User not found', 'not-found');
-      return false;
-    }
-
-    stakes = await getUserStakesByUserId(user.dataValues.id);
-
-  } else {
-    console.log('....call only possible from the motorverse hub!');
-    errorService.stashNotFound('Action not permitted', 'not-permitted');
-    return false;
-  }
-
-  return stakes;
-}
-
-/**
- * Gets stakes from a user:
- *
- * 1. Make sure we have a synced record for the user account.
- * 2. If we do, we add points to that user and retrieve the user data
- * 3. If we don't, we give an error
- *
- * @param {object} data
- * @returns {Object}
- */
-const getUserLeaderboard = async () => {
-
-  let leaderboard = await getUserLeaderboardFromTable();
-
-  return leaderboard;
-}
-
 module.exports = {
-  verifyAccount,
+  userLogin,
   generateOtpForGame,
   linkGameToUser,
   linkExternalWallet,
@@ -779,12 +514,5 @@ module.exports = {
   unlinkGameWallet,
   getUserMvWalletById,
   getUserByMotorverseOrExternalWallet,
-  generateCustomJwt,
-  generateMocaverseJwt,
-  redeemUserPoints,
-  getUserPoints,
-  getUserStakes,
   updateUserStake,
-  getUserPointsHistory,
-  getUserLeaderboard,
 };

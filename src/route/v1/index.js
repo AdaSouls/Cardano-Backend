@@ -3,6 +3,7 @@ const router = express.Router();
 const config = require('../../config/config');
 const assetRoute = require("./asset.route");
 const adminRoute = require("./admin.route");
+const collectionRoute = require("./collection.route");
 const walletRoute = require("./wallet.route");
 const healthCheckRoute = require('./healthCheck.route');
 const userRoute = require('./user.route');
@@ -20,6 +21,10 @@ const defaultRoutes = [
     route: assetRoute,
   },
   {
+    path: "/collection",
+    route: collectionRoute,
+  },
+  {
     path: "/soulbound",
     route: soulboundRoute,
   },
@@ -28,11 +33,11 @@ const defaultRoutes = [
     route: healthCheckRoute,
   },
   {
-    path: '/spos',
+    path: '/spo',
     route: spoRoute,
   },
   {
-    path: '/users',
+    path: '/user',
     route: userRoute,
   },
   {

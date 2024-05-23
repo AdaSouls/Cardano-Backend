@@ -11,45 +11,37 @@ const errorService = require('../service/error.service');
 */
 
 /**
- * Verify.
+ * Login.
  */
-const verifyAccount = catchAsync(async (req, res) => {
-  if (!codeService.checkCode(req, 'userVerify')) {
+const userLogin = catchAsync(async (req, res) => {
+  if (!codeService.checkCode(req, 'userLogin')) {
     errorService.emitStashedError(res);
     return;
   }
 
-  let authInfo;
+  const user = await userService.userLogin(req.body.sigData, req.body.email, req.body.username);
 
-  switch (req.body.source) {
-    case "mv":
-      authInfo = await authService.checkMvAuth(req, req.body);
-      break;
-    case "td2":
-      //authInfo = await authService.checkB2cAuth(req);
-      authInfo = await authService.checkGameAuth(req);
-      break;
-    default:
-      console.log(`game ${req.body.source} is not supported by the motorverse`);
-      errorService.unauthorized(res)
-      return;
-  }
-
-  if (!authInfo.valid) {
-    errorService.unauthorized(res, authInfo.code, authInfo.reason);
-    return;
-  }
-
-  console.log("AUTH INFO WALLET: ", authInfo.wallet);
-
-  const user = await userService.verifyAccount(req.body, authInfo.jwt, authInfo.wallet);
-
-  if (!user) {
+  if (user === false) {
     errorService.emitStashedError(res);
     return;
   }
 
-  res.send(user.toSanitisedJson());
+  if (user.token === "signature failed") {
+    return res.status(401).send({
+      message: "The Cardano wallet authentication failed"
+    });
+  }
+
+  if (user.token === "jwt generation failed") {
+    return res.status(500).send({
+      message: "The JWT generation failed"
+    });
+  }
+
+  req.session.token = user.token;
+
+  return res.status(200).send(user.user.toSanitisedJson());
+
 });
 
 /*
@@ -64,13 +56,6 @@ const verifyAccount = catchAsync(async (req, res) => {
 const generateOtp = catchAsync(async (req, res) => {
   if (!codeService.checkCode(req, 'userGenerateOtp')) {
     errorService.emitStashedError(res);
-    return;
-  }
-
-  let authInfo = await authService.checkMvAuth(req, req.body);
-
-  if (!authInfo.valid) {
-    errorService.unauthorized(res, authInfo.code, authInfo.reason);
     return;
   }
 
@@ -117,13 +102,6 @@ const linkExternalWallet = catchAsync(async (req, res) => {
     return;
   }
 
-  let authInfo = await authService.checkMvAuth(req, req.body);
-
-  if (!authInfo.valid) {
-    errorService.unauthorized(res, authInfo.code, authInfo.reason);
-    return;
-  }
-
   const user = await userService.linkExternalWallet(req.body, authInfo.jwt);
 
   if (!user) {
@@ -140,13 +118,6 @@ const linkExternalWallet = catchAsync(async (req, res) => {
 const unlinkExternalWallet = catchAsync(async (req, res) => {
   if (!codeService.checkCode(req, 'unlinkExternalWallet')) {
     errorService.emitStashedError(res);
-    return;
-  }
-
-  let authInfo = await authService.checkMvAuth(req, req.body);
-
-  if (!authInfo.valid) {
-    errorService.unauthorized(res, authInfo.code, authInfo.reason);
     return;
   }
 
@@ -236,29 +207,6 @@ const generateCustomJwt = catchAsync(async (req, res) => {
 });
 
 /**
- * Generate Mocaverse jwt.
- */
-const generateMocaverseJwt = catchAsync(async (req, res) => {
-  if (!codeService.checkCode(req, 'generateMocaverseJwt')) {
-    errorService.emitStashedError(res);
-    return;
-  }
-
-  const mocaverseJwt = await userService.generateMocaverseJwt(req.body);
-
-  if (!mocaverseJwt) {
-    errorService.emitStashedError(res);
-    return;
-  }
-
-  res.send({
-    status: "ok",
-    jwt: mocaverseJwt
-  });
-
-});
-
-/**
  * Add points to user.
  */
 const redeemUserPoints = catchAsync(async (req, res) => {
@@ -273,9 +221,6 @@ const redeemUserPoints = catchAsync(async (req, res) => {
     case "mv":
       authInfo = await authService.checkMvAuth(req, req.body);
       break;
-/*     case "td2":
-      authInfo = await authService.checkGameAuth(req);
-      break; */
     default:
       console.log(`game ${req.body.source} is not supported by the motorverse`);
       errorService.unauthorized(res)
@@ -299,150 +244,8 @@ const redeemUserPoints = catchAsync(async (req, res) => {
   res.send(user.toSanitisedJson());
 });
 
-/**
- * Get points of user.
- */
-const getUserPoints = catchAsync(async (req, res) => {
-  if (!codeService.checkCode(req, 'getUserPoints')) {
-    errorService.emitStashedError(res);
-    return;
-  }
-
-  let authInfo;
-
-  switch (req.body.source) {
-    case "mv":
-      authInfo = await authService.checkMvAuth(req, req.body);
-      break;
-/*     case "td2":
-      authInfo = await authService.checkGameAuth(req);
-      break; */
-    default:
-      console.log(`game ${req.body.source} is not supported by the motorverse`);
-      errorService.unauthorized(res)
-      return;
-  }
-
-  if (!authInfo.valid) {
-    errorService.unauthorized(res, authInfo.code, authInfo.reason);
-    return;
-  }
-
-  console.log('auth info', authInfo);
-
-  const userPoints = await userService.getUserPoints(req.body, authInfo.jwt);
-
-  if (!userPoints) {
-    errorService.emitStashedError(res);
-    return;
-  }
-
-  res.send(userPoints);
-});
-
-/**
- * Get stakes of a user.
- */
-const getUserStakes = catchAsync(async (req, res) => {
-  if (!codeService.checkCode(req, 'getUserStakes')) {
-    errorService.emitStashedError(res);
-    return;
-  }
-
-  let authInfo;
-
-  switch (req.body.source) {
-    case "mv":
-      authInfo = await authService.checkMvAuth(req, req.body);
-      break;
-/*     case "td2":
-      authInfo = await authService.checkGameAuth(req);
-      break; */
-    default:
-      console.log(`game ${req.body.source} is not supported by the motorverse`);
-      errorService.unauthorized(res)
-      return;
-  }
-
-  if (!authInfo.valid) {
-    errorService.unauthorized(res, authInfo.code, authInfo.reason);
-    return;
-  }
-
-  console.log('auth info', authInfo);
-
-  const stakes = await userService.getUserStakes(req.body, authInfo.jwt);
-
-  if (!stakes) {
-    errorService.emitStashedError(res);
-    return;
-  }
-
-  res.send(stakes.map((stake) => stake.toSanitisedJson()));
-});
-
-/**
- * Get the history of points from a user.
- */
-const getUserPointsHistory = catchAsync(async (req, res) => {
-  if (!codeService.checkCode(req, 'getUserPointsHistory')) {
-    errorService.emitStashedError(res);
-    return;
-  }
-
-  let authInfo;
-
-  switch (req.body.source) {
-    case "mv":
-      authInfo = await authService.checkMvAuth(req, req.body);
-      break;
-/*     case "td2":
-      authInfo = await authService.checkGameAuth(req);
-      break; */
-    default:
-      console.log(`game ${req.body.source} is not supported by the motorverse`);
-      errorService.unauthorized(res)
-      return;
-  }
-
-  if (!authInfo.valid) {
-    errorService.unauthorized(res, authInfo.code, authInfo.reason);
-    return;
-  }
-
-  console.log('auth info', authInfo);
-
-  const userPoints = await userService.getUserPointsHistory(req.body, authInfo.jwt);
-
-  if (!userPoints) {
-    errorService.emitStashedError(res);
-    return;
-  }
-
-  res.send(userPoints.map(userPoint => userPoint.toSanitisedJson()));
-});
-
-/**
- * Get the user leaderboard.
- */
-const getUserLeaderboard = catchAsync(async (req, res) => {
-  if (!codeService.checkCode(req, 'getUserLeaderboard')) {
-    errorService.emitStashedError(res);
-    return;
-  }
-
-  const userLeaderboard = await userService.getUserLeaderboard();
-
-  if (!userLeaderboard) {
-    errorService.emitStashedError(res);
-    return;
-  }
-
-  res.send(userLeaderboard);
-});
-
 module.exports = {
-  verifyAccount,
+  userLogin,
   generateOtp,
   linkGame,
   linkExternalWallet,
@@ -450,10 +253,5 @@ module.exports = {
   linkGameWallet,
   unlinkGameWallet,
   generateCustomJwt,
-  generateMocaverseJwt,
   redeemUserPoints,
-  getUserPoints,
-  getUserStakes,
-  getUserPointsHistory,
-  getUserLeaderboard,
 };

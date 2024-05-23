@@ -3,6 +3,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require('helmet');
 const cors = require('cors');
 const compression = require('compression');
+const cookieSession = require("cookie-session");
 const xss = require('xss-clean');
 const httpStatus = require('http-status');
 const config = require('./config/config');
@@ -29,6 +30,16 @@ app.use(express.json());
 // parse urlencoded request body
 app.use(express.urlencoded({ extended: true }));
 
+// req.session
+app.use(
+  cookieSession({
+    name: "bezkoder-session",
+    keys: [config.jwt.sessionSecret],
+    httpOnly: true,
+    sameSite: "strict",
+  })
+);
+
 // sanitize request data
 app.use(xss());
 app.use(mongoSanitize());
@@ -37,11 +48,11 @@ app.use(mongoSanitize());
 app.use(compression());
 
 // enable cors
-if (config.frontendUrl2 || config.frontendUrl3 || config.frontendUrl4) {
+if (config.frontendUrl2) {
   app.use(
     cors({
       credentials: true,
-      origin: [config.frontendUrl, config.frontendUrl2 || '', config.frontendUrl3 || '', config.frontendUrl4 || ''],
+      origin: [config.frontendUrl, config.frontendUrl2 || ''],
     })
   );
 } else {

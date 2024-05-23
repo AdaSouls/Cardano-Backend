@@ -67,5 +67,6 @@ module.exports = {
   },
   jwt: {
     customSecret: envVars.CUSTOM_JWT_SECRET,
+    sessionSecret: envVars.COOKIE_SESSION_SECRET,
   },
 };

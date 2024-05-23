@@ -46,12 +46,18 @@ module.exports = function (sequelize) {
     tableName: 'soulbounds',
     indexes: [
       {
-        name: 'soulbound_soulboundid',
+        name: 'soulbounds_soulboundId',
         unique: true,
         fields: ['soulboundId'],
       },
     ],
   });
+
+  Soulbound.associate = (models) => {
+    Soulbound.belongsTo(models.Collection, {
+      foreignKey: 'collectionId',
+    });
+  };
 
   return Soulbound;
 };

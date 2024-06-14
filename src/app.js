@@ -9,11 +9,13 @@ const httpStatus = require('http-status');
 const config = require('./config/config');
 const morgan = require('./config/morgan');
 const routesV1 = require('./route/v1');
+const argv = require('minimist')(process.argv.slice(2));
 const { errorConverter, errorHandler } = require('./middleware/error');
 const checkDown = require('./middleware/down');
 const ApiError = require('./util/ApiError');
 
 const app = express();
+const subpath = express();
 
 // morgan logger
 if (config.env !== 'test') {
@@ -69,6 +71,51 @@ app.use(checkDown);
 
 // v1 api routes
 app.use('/api/v1', routesV1);
+
+// v1 swagger
+app.use('/swagger/v1', subpath);
+
+const swagger = require('swagger-node-express').createNew(subpath);
+
+app.use(express.static('dist'));
+
+swagger.setApiInfo({
+  title: "Cardano Backend API",
+  description: "AdaSouls implementation of a Node.js Server + Postgres that interacts with Cardano Blockchain",
+  termsOfServiceUrl: "",
+  contact: "matias.falcone@gmail.com",
+  license: "",
+  licenseUrl: ""
+});
+
+app.get('/', function (req, res) {
+  res.sendFile(__dirname + '/dist/index.html');
+});
+
+// Set api-doc path
+swagger.configureSwaggerPaths('', 'api-docs', '');
+
+// Configure the API domain
+var domain = 'localhost';
+if(argv.domain !== undefined)
+  domain = argv.domain;
+else
+  console.log('No --domain=xxx specified, taking default hostname "localhost".')
+
+// Configure the API port
+var port = 9999;
+if(argv.port !== undefined)
+  port = argv.port;
+else
+  console.log('No --port=xxx specified, taking default port ' + port + '.')
+
+// Set and display the application URL
+var applicationUrl = 'http://' + domain + ':' + port;
+console.log('snapJob API running on ' + applicationUrl);
+
+swagger.setAppHandler(app);
+swagger.configure(applicationUrl, '1.0.0');
+app.listen(port);
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {

@@ -31,6 +31,46 @@ const getUserCollections = catchAsync(async (req, res) => {
 });
 
 /**
+ * Get a list of all the soulbound collections that a user has been invited to.
+ */
+const getUserInvitedCollections = catchAsync(async (req, res) => {
+  if (!codeService.checkCode(req, 'getUserInvitedCollections')) {
+    errorService.emitStashedError(res);
+    return;
+  }
+
+  const collections = await collectionService.getAllUserInvitedCollections(req.params.userId);
+
+  if (!collections) {
+    errorService.emitStashedError(res);
+    return;
+  }
+
+  res.status(httpStatus.OK).send(collections.map((collection) => collection.toSanitisedJson()));
+
+});
+
+/**
+ * Sign a soulbound collection that a user has been invited to.
+ */
+const signCollection = catchAsync(async (req, res) => {
+  if (!codeService.checkCode(req, 'signCollection')) {
+    errorService.emitStashedError(res);
+    return;
+  }
+
+  const collection = await collectionService.signCollection(req.params.collectionId, req.params.userId);
+
+  if (!collection) {
+    errorService.emitStashedError(res);
+    return;
+  }
+
+  res.status(httpStatus.OK).send(collection.toSanitisedJson());
+
+});
+
+/**
  * Add a soulbound collection to a user.
  */
 const addUserCollection = catchAsync(async (req, res) => {
@@ -39,7 +79,7 @@ const addUserCollection = catchAsync(async (req, res) => {
     return;
   }
 
-  const newCollection = await collectionService.addUserCollection(req.params.userId, req.body);
+  const newCollection = await collectionService.addUserCollection(req.params, req.body);
 
   if (!newCollection) {
     errorService.emitStashedError(res);
@@ -52,5 +92,7 @@ const addUserCollection = catchAsync(async (req, res) => {
 
 module.exports = {
   getUserCollections,
+  getUserInvitedCollections,
+  signCollection,
   addUserCollection,
 };

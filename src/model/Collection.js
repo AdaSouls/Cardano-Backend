@@ -4,15 +4,22 @@ const models = require("../model");
 
 module.exports = function (sequelize) {
 
-  const { fn, col, DataTypes, Model, Op } = Sequelize;
+  const { DataTypes, Model } = Sequelize;
 
   class Collection extends Model {
     toSanitisedJson() {
       let resp = {
         collectionId: this.collectionId,
+        owner: this.owner,
         name: this.name,
         smartContract: this.smartContract,
+        policyId: this.policyId,
+        policyHash: this.policyHash,
         policy: this.policy,
+        mint: this.mint,
+        redeem: this.redeem,
+        tokens: this.tokens,
+        invited: this.invited,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
       };
@@ -38,18 +45,48 @@ module.exports = function (sequelize) {
       defaultValue: Sequelize.literal("gen_random_uuid()"),
       allowNull: false,
     },
+    owner: {
+      type: DataTypes.STRING(64),
+      allowNull: false,
+    },
     name: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.STRING(100),
       allowNull: false,
     },
     smartContract: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(64),
       allowNull: false,
+    },
+    policyId: {
+      type: DataTypes.STRING(56),
+      allowNull: false,
+      unique: false,
+    },
+    policyHash: {
+      type: DataTypes.STRING(64),
+      allowNull: false,
+      unique: false,
     },
     policy: {
       type: DataTypes.JSONB,
       allowNull: false,
     },
+    mint: {
+      type: DataTypes.JSONB,
+      allowNull: false,
+    },
+    redeem: {
+      type: DataTypes.JSONB,
+      allowNull: false,
+    },
+    tokens: {
+      type: DataTypes.ARRAY(DataTypes.INTEGER),
+      defaultValue: [],
+    },
+    invited: {
+      type: DataTypes.JSONB,
+      defaultValue: [],
+    }
   }, {
     sequelize,
     schema: config.postgresql.schema,

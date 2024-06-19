@@ -21,7 +21,7 @@ const defaultRoutes = [
     route: assetRoute,
   },
   {
-    path: "/collection",
+    path: "/collections",
     route: collectionRoute,
   },
   {

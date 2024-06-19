@@ -231,4 +231,4 @@ async function flushAllDb() {
 /**
  * Module initialisation.
  */
-init();
+//init();

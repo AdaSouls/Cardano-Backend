@@ -42,7 +42,7 @@ module.exports = {
     password: envVars.POSTGRESQL_PASSWORD,
     port: envVars.POSTGRESQL_PORT,
     schema: envVars.POSTGRESQL_SCHEMA,
-    url: envVars.POSTGRESQL_URL,
+    url: envVars.DATABASE_URL,
   },
   logger: {
     file: envVars.LOG_FILE,

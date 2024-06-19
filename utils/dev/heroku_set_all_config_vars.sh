@@ -34,6 +34,8 @@ cfgVars=(
   [SUPPORTED_CHAINS]="polygon:amoy, ethereum:sepolia"
   [NETWORK_RPC_URLS]="https://polygon-amoy.g.alchemy.com/v2/hzlkisWZjAHveyetlZlySggkeWf5U_xu, https://eth-sepolia.g.alchemy.com/v2/gSkDzX85fosCDnq3bswde7eDaM_7Q7w0"
   [ALCHEMY_API_KEYS]="hzlkisWZjAHveyetlZlySggkeWf5U_xu, gSkDzX85fosCDnq3bswde7eDaM_7Q7w0"
+  [BLOCKFROST_API_KEY]="preprodHQwbvKLU7GHTmZfMifLlk9NBMq3JTDKV"
+
 )
 
 

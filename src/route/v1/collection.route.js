@@ -9,4 +9,9 @@ router.route('/getUserInvited/:userId').get(validate(collectionValidation.getUse
 router.route('/sign/:collectionId/:userId').post(validate(collectionValidation.signCollection), collectionController.signCollection);
 router.route('/:userId').post(validate(collectionValidation.addUserCollection), collectionController.addUserCollection);
 
+// SOULBOUNDS
+router.route('/:collectionId/soulbounds').get(validate(collectionValidation.getCollectionSoulbounds), collectionController.getCollectionSoulbounds);
+router.route('/:collectionId/soulbounds').post(validate(collectionValidation.addCollectionSoulbound), collectionController.addCollectionSoulbound);
+router.route('/:collectionId/soulbounds/:soulboundId').patch(validate(collectionValidation.updateCollectionSoulbound), collectionController.updateCollectionSoulbound);
+
 module.exports = router;

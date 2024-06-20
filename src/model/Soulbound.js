@@ -10,7 +10,14 @@ module.exports = function (sequelize) {
     toSanitisedJson() {
       let resp = {
         soulboundId: this.soulboundId,
+        collectionId: this.collectionId,
         name: this.name,
+        beneficiary: this.beneficiary,
+        metadata: this.metadata,
+        mintUtxo: this.mintUtxo,
+        claimUtxo: this.claimUtxo,
+        burnTx: this.burnTx,
+        signers: this.signers,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
       };
@@ -36,10 +43,38 @@ module.exports = function (sequelize) {
       defaultValue: Sequelize.literal("gen_random_uuid()"),
       allowNull: false,
     },
+    collectionId: {
+      type: Sequelize.UUID,
+      allowNull: false,
+    },
     name: {
       type: DataTypes.STRING(50),
       allowNull: false,
     },
+    beneficiary: {
+      type: DataTypes.STRING(256),
+      allowNull: false,
+    },
+    metadata: {
+      type: DataTypes.JSONB,
+      allowNull: false,
+    },
+    mintUtxo: {
+      type: DataTypes.JSONB,
+      allowNull: true,
+    },
+    claimUtxo: {
+      type: DataTypes.JSONB,
+      allowNull: true,
+    },
+    burnTx: {
+      type: DataTypes.STRING(64),
+      allowNull: true,
+    },
+    signers: {
+      type: DataTypes.JSONB,
+      defaultValue: [],
+    }
   }, {
     sequelize,
     schema: config.postgresql.schema,
@@ -56,6 +91,8 @@ module.exports = function (sequelize) {
   Soulbound.associate = (models) => {
     Soulbound.belongsTo(models.Collection, {
       foreignKey: 'collectionId',
+      targetKey: 'collectionId',
+      keyType: DataTypes.UUID
     });
   };
 

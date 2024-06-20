@@ -90,9 +90,72 @@ const addUserCollection = catchAsync(async (req, res) => {
 
 });
 
+/**
+ * Add a soulbound to a collection.
+ */
+const addCollectionSoulbound = catchAsync(async (req, res) => {
+  if (!codeService.checkCode(req, 'addCollectionSoulbound')) {
+    errorService.emitStashedError(res);
+    return;
+  }
+
+  const newSoulbound = await collectionService.addCollectionSoulbound(req.params, req.body);
+
+  if (!newSoulbound) {
+    errorService.emitStashedError(res);
+    return;
+  }
+
+  res.status(httpStatus.OK).send(newSoulbound.toSanitisedJson());
+
+});
+
+
+/**
+ * Update a soulbound .
+ */
+const updateCollectionSoulbound = catchAsync(async (req, res) => {
+  if (!codeService.checkCode(req, 'updateCollectionSoulbound')) {
+    errorService.emitStashedError(res);
+    return;
+  }
+
+  const updatedSoulbound = await collectionService.updateCollectionSoulbound(req.params, req.body);
+
+  if (!updatedSoulbound) {
+    errorService.emitStashedError(res);
+    return;
+  }
+
+  res.status(httpStatus.OK).send(updatedSoulbound.toSanitisedJson());
+
+});
+
+/**
+ * Get Collection soulbounds
+ */
+const getCollectionSoulbounds = catchAsync(async (req, res) => {
+  if (!codeService.checkCode(req, 'getCollectionSoulbounds')) {
+    errorService.emitStashedError(res);
+    return;
+  }
+
+  const soulbounds = await collectionService.getCollectionSoulbounds(req.params.collectionId);
+  if (!soulbounds) {
+    errorService.emitStashedError(res);
+    return;
+  }
+
+  res.status(httpStatus.OK).send(soulbounds.map((soulbound) => soulbound.toSanitisedJson()));
+
+})
+
 module.exports = {
   getUserCollections,
   getUserInvitedCollections,
   signCollection,
   addUserCollection,
+  addCollectionSoulbound,
+  updateCollectionSoulbound,
+  getCollectionSoulbounds
 };

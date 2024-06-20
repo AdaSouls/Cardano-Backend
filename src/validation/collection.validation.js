@@ -35,9 +35,41 @@ const addUserCollection = {
   }),
 };
 
+const addCollectionSoulbound = {
+  params: Joi.object().keys({
+    collectionId: Joi.string().required(),
+  }),
+  body: Joi.object().keys({
+    name: Joi.string().required(),
+    beneficiary: Joi.string().required(),
+    metadata: Joi.object().required(),
+    signers: Joi.array().items(Joi.object()).required(),
+  }),
+};
+
+const updateCollectionSoulbound = {
+  params: Joi.object().keys({
+    collectionId: Joi.string().required(),
+    soulboundId: Joi.string().required(),
+  }),
+  body: Joi.object().keys({
+    mintUtxo: Joi.object().required(),
+    signers: Joi.array().items(Joi.object()).required(),
+  }),
+};
+
+const getCollectionSoulbounds = {
+  params: Joi.object().keys({
+    collectionId: Joi.string().required(),
+  }),
+};
+
 module.exports = {
   getUserCollections,
   getUserInvitedCollections,
   signCollection,
   addUserCollection,
+  addCollectionSoulbound,
+  updateCollectionSoulbound,
+  getCollectionSoulbounds
 };

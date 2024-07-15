@@ -37,7 +37,7 @@ const defaultRoutes = [
     route: spoRoute,
   },
   {
-    path: '/user',
+    path: '/users',
     route: userRoute,
   },
   {

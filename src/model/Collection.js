@@ -18,7 +18,7 @@ module.exports = function (sequelize) {
         policy: this.policy,
         mint: this.mint,
         redeem: this.redeem,
-        tokens: this.tokens,
+        // tokens: this.tokens,
         invited: this.invited,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
@@ -79,10 +79,10 @@ module.exports = function (sequelize) {
       type: DataTypes.JSONB,
       allowNull: false,
     },
-    tokens: {
-      type: DataTypes.ARRAY(DataTypes.INTEGER),
-      defaultValue: [],
-    },
+    // tokens: {
+    //   type: DataTypes.ARRAY(DataTypes.INTEGER),
+    //   defaultValue: [],
+    // },
     invited: {
       type: DataTypes.JSONB,
       defaultValue: [],
@@ -103,6 +103,12 @@ module.exports = function (sequelize) {
   Collection.associate = (models) => {
     Collection.belongsTo(models.User, {
       foreignKey: 'userId',
+    });
+    Collection.hasMany(models.Soulbound, {
+      foreignKey: 'collectionId',
+      sourceKey: 'collectionId',
+      keyType: DataTypes.UUID,
+      as: 'tokens'
     });
   };
 

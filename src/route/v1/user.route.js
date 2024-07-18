@@ -15,5 +15,6 @@ router.route('/unlinkExternalWallet').post(validate(userValidation.unlinkExterna
 // COLLECTIONS
 router.route('/:userId/collections').get(validate(collectionValidation.getUserCollections), collectionController.getUserCollections);
 router.route('/:userId/collections/invited').get(validate(collectionValidation.getUserInvitedCollections), collectionController.getUserInvitedCollections);
+router.route('/:userId/soulbounds/claimable').get(validate(collectionValidation.getUserClaimableSoulbounds), collectionController.getUserClaimableSoulbounds);
 
 module.exports = router;

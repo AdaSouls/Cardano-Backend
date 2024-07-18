@@ -188,7 +188,27 @@ const getCollectionSoulbounds = catchAsync(async (req, res) => {
 
   res.status(httpStatus.OK).send(soulbounds.map((soulbound) => soulbound.toSanitisedJson()));
 
-})
+});
+
+/**
+ * Get a list of all user's claimable souldbounds.
+ */
+const getUserClaimableSoulbounds = catchAsync(async (req, res) => {
+  if (!codeService.checkCode(req, 'getUserClaimableSoulbounds')) {
+    errorService.emitStashedError(res);
+    return;
+  }
+
+  const tokens = await collectionService.getUserClaimableSoulbounds(req.params.userId);
+
+  if (!tokens) {
+    errorService.emitStashedError(res);
+    return;
+  }
+
+  res.status(httpStatus.OK).send(tokens.map((t) => ({...t.toSanitisedJson(), collection: t.collection.toSanitisedJson()})));
+
+});
 
 module.exports = {
   getUserCollections,
@@ -196,4 +216,8 @@ module.exports = {
   signCollection,
   getCollection,
   addUserCollection,
+  getCollectionSoulbounds,
+  addCollectionSoulbound,
+  updateCollectionSoulbound,
+  getUserClaimableSoulbounds
 };

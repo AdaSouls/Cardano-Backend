@@ -86,6 +86,12 @@ const getCollectionSoulbounds = {
   }),
 };
 
+const getUserClaimableSoulbounds = {
+  params: Joi.object().keys({
+    userId: Joi.string().required(),
+  }),
+};
+
 module.exports = {
   getUserCollections,
   getUserInvitedCollections,
@@ -95,5 +101,6 @@ module.exports = {
   getCollection,
   addCollectionSoulbound,
   updateCollectionSoulbound,
-  getCollectionSoulbounds
+  getCollectionSoulbounds,
+  getUserClaimableSoulbounds
 };

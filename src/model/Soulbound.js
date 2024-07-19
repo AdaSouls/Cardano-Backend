@@ -49,6 +49,10 @@ module.exports = function (sequelize) {
       type: DataTypes.STRING(256),
       allowNull: false,
     },
+    beneficiary_stake: {
+      type: DataTypes.STRING(256),
+      allowNull: true,
+    },
     metadata: {
       type: DataTypes.JSONB,
       allowNull: false,

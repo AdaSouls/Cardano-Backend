@@ -223,6 +223,28 @@ const getCollectionSoulbounds = async (collectionId) => {
   return collections;
 };
 
+/**
+ * Get all soulbound collections a user is the beneficiary.
+ *
+ * @param {string} userId
+ * @returns {Array} collections
+ */
+const getUserClaimableSoulbounds = async (userId) => {
+  let collections = await models.Soulbound.findAll({
+    include: [{
+      model: models.Collection,
+      as: 'collection',
+      required: true // This will make an inner join, optional: false would make it a left join
+    }],
+    where: {
+      beneficiary_stake: {
+        [Op.eq]: userId
+      },
+    }
+  });
+  return collections;
+};
+
 
 
 module.exports = {
@@ -232,4 +254,8 @@ module.exports = {
   signCollection,
   getCollection,
   addUserCollection,
+  addCollectionSoulbound,
+  updateCollectionSoulbound,
+  getCollectionSoulbounds,
+  getUserClaimableSoulbounds
 };

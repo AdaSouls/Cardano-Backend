@@ -130,7 +130,7 @@ const addUserCollection = async (params, body) => {
 const addCollectionSoulbound = async (params, body) => {
 
   let { collectionId } = params;
-  let { name, beneficiary, metadata } = body;
+  let { name, beneficiary, beneficiary_stake, metadata, mintUtxo } = body;
 
   let collection = await models.Collection.findOne({ where: { collectionId }});
   if (!collection) {
@@ -144,8 +144,9 @@ const addCollectionSoulbound = async (params, body) => {
     collectionId,
     name,
     beneficiary,
+    beneficiary_stake,
     metadata,
-    mintUtxo: body.mintUtxo || null,
+    mintUtxo: mintUtxo,
     claimUtxo: null,
     burnTx: null,
   };

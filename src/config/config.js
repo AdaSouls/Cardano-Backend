@@ -23,7 +23,6 @@ module.exports = {
   env: envVars.NODE_ENV,
   port: envVars.PORT,
   frontendUrl: envVars.FRONTEND_URL,
-  frontendUrl2: envVars.FRONTEND_URL_2,
   db: {
     migrations: envVars.DB_MIGRATION || 'pending',
     sync: envVars.DB_SYNC || 'none',
@@ -47,10 +46,7 @@ module.exports = {
   logger: {
     file: envVars.LOG_FILE,
   },
-  walletContentMethod: envVars.WALLET_CONTENT_METHOD,
   web3: {
-    supportedChains: envVars.SUPPORTED_CHAINS.split(', '),
-    networkRpcUrls: envVars.NETWORK_RPC_URLS.split(', '),
     blockfrost: {
       apiKey: envVars.BLOCKFROST_API_KEY,
     },
@@ -64,9 +60,5 @@ module.exports = {
   },
   functionCodes: {
     master: envVars.CODE_MASTER,
-  },
-  jwt: {
-    customSecret: envVars.CUSTOM_JWT_SECRET,
-    sessionSecret: envVars.COOKIE_SESSION_SECRET,
   },
 };

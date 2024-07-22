@@ -10,6 +10,7 @@ module.exports = function (sequelize) {
     toSanitisedJson() {
       let resp = {
         soulboundId: this.soulboundId,
+        collectionId: this.collectionId,
         name: this.name,
         beneficiary: this.beneficiary,
         metadata: this.metadata,
@@ -39,6 +40,10 @@ module.exports = function (sequelize) {
     soulboundId: {
       type: Sequelize.UUID,
       defaultValue: Sequelize.literal("gen_random_uuid()"),
+      allowNull: false,
+    },
+    collectionId: {
+      type: Sequelize.UUID,
       allowNull: false,
     },
     name: {

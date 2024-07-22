@@ -29,6 +29,7 @@ cfgVars=(
   [REDIS_SOURCE]=heroku
   [REDIS_TTL]=3600
   [FRONTEND_URL]="http://localhost:3000"
+  [COOKIE_SESSION_SECRET]="lF61oh8H3YhISpc9wd1q9VuWXd4HiEYLUmEsTe7w=="
   [BLOCKFROST_API_KEY]="preprodHQwbvKLU7GHTmZfMifLlk9NBMq3JTDKV"
 )
 

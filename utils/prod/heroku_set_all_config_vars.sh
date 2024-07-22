@@ -29,6 +29,7 @@ cfgVars=(
   [REDIS_SOURCE]=heroku
   [REDIS_TTL]=3600
   [FRONTEND_URL]="https://app.adasouls.io"
+  [COOKIE_SESSION_SECRET]="lWvak2C9nMZATsYFqe5ykMsjHxGazeATIlNEHEOy=="
   [BLOCKFROST_API_KEY]="mainnetWq3DrSZSshe8TI54yJ7kiZfIQU8nUxRp"
 )
 

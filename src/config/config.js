@@ -61,4 +61,7 @@ module.exports = {
   functionCodes: {
     master: envVars.CODE_MASTER,
   },
+  jwt: {
+    sessionSecret: envVars.COOKIE_SESSION_SECRET,
+  }
 };

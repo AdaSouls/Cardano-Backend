@@ -2,38 +2,44 @@
   "swagger": "2.0",
   "info": {
     "version": "1.0.0",
-    "title": "Sample spec",
-    "description": "Sample spec for Swagger",
+    "title": "AdaSouls REST API",
+    "description": "Specification of AdaSouls REST API",
     "termsOfService": "http://swagger.io/terms/"
   },
-  "basePath": "/",
-  "tags": [{ "name": "Tag1", "description": "API for something" }],
+  "basePath": "/api/v1/",
   "schemes": ["http"],
   "consumes": ["application/json"],
   "produces": ["application/json"],
   "paths": {
-    "/path/to/method": {
+    "/users/login": {
       "post": {
-        "tags": ["Tag1"],
-        "description": "what this API does",
+        "tags": ["Users"],
+        "description": "API to manage user authentication. Verifies the Cardano wallet signature of a user.",
         "operationId": "for the URL",
         "produces": ["application/json"],
         "parameters": [
           {
-            "name": "Job Parameters",
+            "name": "Code",
+            "in": "params",
+            "description": "Backend code",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Signature Data",
             "in": "body",
-            "description": "Job to add to the database",
+            "description": "Cardano wallet signature",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/create"
+              "$ref": "#/definitions/signature"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "create response",
+            "description": "User record response",
             "schema": {
-              "$ref": "#/definitions/response"
+              "$ref": "#/definitions/user"
             }
           }
         }
@@ -89,16 +95,61 @@
     }
   },
   "definitions": {
-    "create": {
+    "signature": {
       "properties": {
-        "eventId": {
+        "signature": {
           "type": "string",
-          "example": "mathmaticial"
+          "example": "845846a2012767616464726573735839016db16201436bcc89cc666226b52fa4c55a32288652c4944600c2869a795d457e80117a7291e5e144b496fd0300595f522b66c891e66ccaefa166686173686564f458446163636f756e743a207374616b653175397534363374377371676835753533756873356664796b6c357073716b326c3267346b646a793375656b76346d637a373978716c5840b72bef319692eff2df416a9dd732b5acfbb0027c01485a92b9ce0f61ffb74a2a2ba808537f58d4bf386767ca3235e71409ff5636f36154830a1c1f5be7bdc20a"
         },
-        "numberRequired": {
-          "type": "integer",
-          "format": "int64",
-          "example": 500
+        "key": {
+          "type": "string",
+          "example": "a40101032720062158207ce709e23c61328b7b6f5f7ef4e804d5acb041e4e233d1f77319e6358c87d793"
+        }
+      }
+    },
+    "user": {
+      "properties": {
+        "userId": {
+          "type": "string",
+          "format": "uuid",
+          "example": "6ebb9463-a39f-471e-80a3-a88b05551478"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "example": "delem@gmail.com"
+        },
+        "username": {
+          "type": "string",
+          "example": "delem123"
+        },
+        "wallet": {
+          "properties": {
+            "type": {
+              "type": "string",
+              "example": "cardano"
+            },
+            "address": {
+              "type": "string",
+              "example": "addr1q9kmzcspgd4uezwvve3zddf05nz45v3gsefvf9zxqrpgdxnet4zhaqq30fefre0pgj6fdlgrqpv4753tvmyfrenvethsqskfke"
+            }
+          }
+        },
+        "stakeAddress": {
+          "type": "string",
+          "example": "stake1u9u463t7sqgh5u53uhs5fdykl5psqk2l2g4kdjy3uekv4mcz79xql"
+        },
+        "roles": {
+          "type": "string",
+          "example": "[]"
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "example": "2024-07-19T10:01:43.373Z"
+        },
+        "updatedAt": {
+          "type": "timestamp",
+          "example": "2024-07-19T10:01:43.373Z"
         }
       }
     },

@@ -17,7 +17,6 @@ module.exports = function (sequelize) {
         mintUtxo: this.mintUtxo,
         claimUtxo: this.claimUtxo,
         burnTx: this.burnTx,
-        signers: this.signers,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
       };
@@ -55,6 +54,10 @@ module.exports = function (sequelize) {
       type: DataTypes.STRING(256),
       allowNull: false,
     },
+    beneficiary_stake: {
+      type: DataTypes.STRING(256),
+      allowNull: true,
+    },
     metadata: {
       type: DataTypes.JSONB,
       allowNull: false,
@@ -70,10 +73,6 @@ module.exports = function (sequelize) {
     burnTx: {
       type: DataTypes.STRING(64),
       allowNull: true,
-    },
-    signers: {
-      type: DataTypes.JSONB,
-      defaultValue: [],
     }
   }, {
     sequelize,
@@ -92,7 +91,8 @@ module.exports = function (sequelize) {
     Soulbound.belongsTo(models.Collection, {
       foreignKey: 'collectionId',
       targetKey: 'collectionId',
-      keyType: DataTypes.UUID
+      keyType: DataTypes.UUID,
+      as: 'collection'
     });
   };
 

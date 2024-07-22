@@ -59,7 +59,7 @@ const signCollection = catchAsync(async (req, res) => {
     return;
   }
 
-  const collection = await collectionService.signCollection(req.params.collectionId, req.params.userId);
+  const collection = await collectionService.signCollection(req.params.collectionId, req.params.userId, req.body.signature);
 
   if (!collection) {
     errorService.emitStashedError(res);
@@ -67,6 +67,26 @@ const signCollection = catchAsync(async (req, res) => {
   }
 
   res.status(httpStatus.OK).send(collection.toSanitisedJson());
+
+});
+
+/**
+ * Get a soulbound collection.
+ */
+const getCollection = catchAsync(async (req, res) => {
+  if (!codeService.checkCode(req, 'getCollection')) {
+    errorService.emitStashedError(res);
+    return;
+  }
+
+  const collection = await collectionService.getCollection(req.params.collectionId);
+
+  if (!collection) {
+    errorService.emitStashedError(res);
+    return;
+  }
+
+  res.status(httpStatus.OK).send({...collection.toSanitisedJson(), tokens: collection.tokens.map(token => token.toSanitisedJson())});
 
 });
 
@@ -87,6 +107,26 @@ const addUserCollection = catchAsync(async (req, res) => {
   }
 
   res.status(httpStatus.OK).send(newCollection.toSanitisedJson());
+
+});
+
+/**
+ * Update a soulbound collection to a user.
+ */
+const updateUserCollection = catchAsync(async (req, res) => {
+  if (!codeService.checkCode(req, 'updateUserCollection')) {
+    errorService.emitStashedError(res);
+    return;
+  }
+
+  const updateCollection = await collectionService.updateUserCollection(req.params, req.body);
+
+  if (!updateCollection) {
+    errorService.emitStashedError(res);
+    return;
+  }
+
+  res.status(httpStatus.OK).send(updateCollection.toSanitisedJson());
 
 });
 
@@ -148,14 +188,36 @@ const getCollectionSoulbounds = catchAsync(async (req, res) => {
 
   res.status(httpStatus.OK).send(soulbounds.map((soulbound) => soulbound.toSanitisedJson()));
 
-})
+});
+
+/**
+ * Get a list of all user's claimable souldbounds.
+ */
+const getUserClaimableSoulbounds = catchAsync(async (req, res) => {
+  if (!codeService.checkCode(req, 'getUserClaimableSoulbounds')) {
+    errorService.emitStashedError(res);
+    return;
+  }
+
+  const tokens = await collectionService.getUserClaimableSoulbounds(req.params.userId);
+
+  if (!tokens) {
+    errorService.emitStashedError(res);
+    return;
+  }
+
+  res.status(httpStatus.OK).send(tokens.map((t) => ({...t.toSanitisedJson(), collection: t.collection.toSanitisedJson()})));
+
+});
 
 module.exports = {
   getUserCollections,
   getUserInvitedCollections,
   signCollection,
+  getCollection,
   addUserCollection,
+  getCollectionSoulbounds,
   addCollectionSoulbound,
   updateCollectionSoulbound,
-  getCollectionSoulbounds
+  getUserClaimableSoulbounds
 };

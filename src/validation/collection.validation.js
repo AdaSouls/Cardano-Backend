@@ -19,6 +19,12 @@ const signCollection = {
   }),
 };
 
+const getCollection = {
+  params: Joi.object().keys({
+    collectionId: Joi.string().required(),
+  }),
+};
+
 const addUserCollection = {
   params: Joi.object().keys({
     userId: Joi.string().required(),
@@ -31,7 +37,23 @@ const addUserCollection = {
     policy: Joi.object().required(),
     mint: Joi.object().required(),
     redeem: Joi.object().required(),
-    invited: Joi.array().items(Joi.string()).optional(),
+    invited: Joi.array().items(Joi.object()).optional(),
+  }),
+};
+
+const updateUserCollection = {
+  params: Joi.object().keys({
+    collectionId: Joi.string().required(),
+  }),
+  body: Joi.object().keys({
+    name: Joi.string().required(),
+    smartContract: Joi.string().forbidden(),
+    policyId: Joi.string().forbidden(),
+    policyHash: Joi.string().forbidden(),
+    policy: Joi.object().forbidden(),
+    mint: Joi.object().forbidden(),
+    redeem: Joi.object().forbidden(),
+    invited: Joi.array().items(Joi.object()).forbidden(),
   }),
 };
 
@@ -43,7 +65,6 @@ const addCollectionSoulbound = {
     name: Joi.string().required(),
     beneficiary: Joi.string().required(),
     metadata: Joi.object().required(),
-    signers: Joi.array().items(Joi.object()).required(),
   }),
 };
 
@@ -53,8 +74,9 @@ const updateCollectionSoulbound = {
     soulboundId: Joi.string().required(),
   }),
   body: Joi.object().keys({
-    mintUtxo: Joi.object().required(),
-    signers: Joi.array().items(Joi.object()).required(),
+    mintUtxo: Joi.object().optional(),
+    claimUtxo: Joi.object().optional(),
+    burnTx: Joi.string().optional(),
   }),
 };
 
@@ -64,12 +86,21 @@ const getCollectionSoulbounds = {
   }),
 };
 
+const getUserClaimableSoulbounds = {
+  params: Joi.object().keys({
+    userId: Joi.string().required(),
+  }),
+};
+
 module.exports = {
   getUserCollections,
   getUserInvitedCollections,
   signCollection,
   addUserCollection,
+  updateUserCollection,
+  getCollection,
   addCollectionSoulbound,
   updateCollectionSoulbound,
-  getCollectionSoulbounds
+  getCollectionSoulbounds,
+  getUserClaimableSoulbounds
 };

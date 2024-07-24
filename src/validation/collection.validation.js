@@ -38,6 +38,7 @@ const addUserCollection = {
     mint: Joi.object().required(),
     redeem: Joi.object().required(),
     invited: Joi.array().items(Joi.object()).optional(),
+    aikenCourse: Joi.boolean().required(),
   }),
 };
 
@@ -54,6 +55,7 @@ const updateUserCollection = {
     mint: Joi.object().forbidden(),
     redeem: Joi.object().forbidden(),
     invited: Joi.array().items(Joi.object()).forbidden(),
+    aikenCourse: Joi.boolean().forbidden(),
   }),
 };
 
@@ -65,6 +67,7 @@ const addCollectionSoulbound = {
     name: Joi.string().required(),
     beneficiary: Joi.string().required(),
     metadata: Joi.object().required(),
+    aikenCourseApproved: Joi.boolean().optional(),
   }),
 };
 
@@ -77,6 +80,7 @@ const updateCollectionSoulbound = {
     mintUtxo: Joi.object().optional(),
     claimUtxo: Joi.object().optional(),
     burnTx: Joi.string().optional(),
+    aikenCourseApproved: Joi.boolean().optional(),
   }),
 };
 

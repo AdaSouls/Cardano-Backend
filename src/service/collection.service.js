@@ -71,7 +71,7 @@ const signCollection = async (collectionId, user, signature) => {
  * @returns {Array} collections
  */
 const getCollection = async (collectionId) => {
-  let collection = await models.Collection.findOne({ 
+  let collection = await models.Collection.findOne({
     where: { collectionId: collectionId },
     include: [
       {
@@ -96,7 +96,7 @@ const getCollection = async (collectionId) => {
 const addUserCollection = async (params, body) => {
 
   let { userId } = params;
-  let { name, smartContract, policyId, policyHash, policy, mint, redeem, invited } = body;
+  let { name, smartContract, policyId, policyHash, policy, mint, redeem, invited, aikenCourse } = body;
 
   const collectionPayload = {
     owner: userId,
@@ -108,6 +108,7 @@ const addUserCollection = async (params, body) => {
     mint,
     redeem,
     invited,
+    aikenCourse,
   };
 
   let newCollection = await models.Collection.create(collectionPayload);
@@ -130,7 +131,7 @@ const addUserCollection = async (params, body) => {
 const addCollectionSoulbound = async (params, body) => {
 
   let { collectionId } = params;
-  let { name, beneficiary, beneficiary_stake, metadata, mintUtxo } = body;
+  let { name, beneficiary, beneficiary_stake, metadata, mintUtxo, aikenCourseApproved } = body;
 
   let collection = await models.Collection.findOne({ where: { collectionId }});
   if (!collection) {
@@ -149,6 +150,7 @@ const addCollectionSoulbound = async (params, body) => {
     mintUtxo: mintUtxo,
     claimUtxo: null,
     burnTx: null,
+    aikenCourseApproved: aikenCourseApproved,
   };
 
   let newSoulbound = await models.Soulbound.create(soulboundPayload);

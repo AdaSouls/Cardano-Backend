@@ -17,6 +17,7 @@ module.exports = function (sequelize) {
         mintUtxo: this.mintUtxo,
         claimUtxo: this.claimUtxo,
         burnTx: this.burnTx,
+        aikenCourseApproved: this.aikenCourseApproved,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
       };
@@ -72,6 +73,10 @@ module.exports = function (sequelize) {
     },
     burnTx: {
       type: DataTypes.STRING(64),
+      allowNull: true,
+    },
+    aikenCourseApproved: {
+      type: DataTypes.BOOLEAN,
       allowNull: true,
     }
   }, {

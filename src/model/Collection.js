@@ -20,6 +20,7 @@ module.exports = function (sequelize) {
         redeem: this.redeem,
         // tokens: this.tokens,
         invited: this.invited,
+        aikenCourse: this.aikenCourse,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
       };
@@ -86,6 +87,10 @@ module.exports = function (sequelize) {
     invited: {
       type: DataTypes.JSONB,
       defaultValue: [],
+    },
+    aikenCourse: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
     }
   }, {
     sequelize,

@@ -96,11 +96,13 @@ const getCollection = async (collectionId) => {
 const addUserCollection = async (params, body) => {
 
   let { userId } = params;
-  let { name, smartContract, policyId, policyHash, policy, mint, redeem, invited, aikenCourse } = body;
+  let { name, symbol, description, smartContract, policyId, policyHash, policy, mint, redeem, invited, aikenCourse } = body;
 
   const collectionPayload = {
     owner: userId,
     name,
+    symbol,
+    description,
     smartContract,
     policyId,
     policyHash,

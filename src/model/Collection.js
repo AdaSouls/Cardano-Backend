@@ -12,6 +12,8 @@ module.exports = function (sequelize) {
         collectionId: this.collectionId,
         owner: this.owner,
         name: this.name,
+        symbol: this.symbol,
+        description: this.description,
         smartContract: this.smartContract,
         policyId: this.policyId,
         policyHash: this.policyHash,
@@ -53,6 +55,14 @@ module.exports = function (sequelize) {
     name: {
       type: DataTypes.STRING(100),
       allowNull: false,
+    },
+    symbol: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    description: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
     },
     smartContract: {
       type: DataTypes.STRING(64),

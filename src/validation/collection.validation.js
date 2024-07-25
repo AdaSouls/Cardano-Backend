@@ -31,6 +31,8 @@ const addUserCollection = {
   }),
   body: Joi.object().keys({
     name: Joi.string().required(),
+    symbol: Joi.string().optional(),
+    description: Joi.string().optional(),
     smartContract: Joi.string().required(),
     policyId: Joi.string().required(),
     policyHash: Joi.string().required(),
@@ -48,6 +50,8 @@ const updateUserCollection = {
   }),
   body: Joi.object().keys({
     name: Joi.string().required(),
+    symbol: Joi.string().optional(),
+    description: Joi.string().optional(),
     smartContract: Joi.string().forbidden(),
     policyId: Joi.string().forbidden(),
     policyHash: Joi.string().forbidden(),

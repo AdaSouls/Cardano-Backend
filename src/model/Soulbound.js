@@ -76,7 +76,7 @@ module.exports = function (sequelize) {
       allowNull: true,
     },
     aikenCourseApproved: {
-      type: DataTypes.BOOLEAN,
+      type: DataTypes.STRING(50),
       allowNull: true,
     }
   }, {

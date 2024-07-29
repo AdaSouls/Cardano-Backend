@@ -71,7 +71,7 @@ const addCollectionSoulbound = {
     name: Joi.string().required(),
     beneficiary: Joi.string().required(),
     metadata: Joi.object().required(),
-    aikenCourseApproved: Joi.boolean().optional(),
+    aikenCourseApproved: Joi.string().valid("", "aprobado", "honores").optional(),
   }),
 };
 
@@ -84,7 +84,7 @@ const updateCollectionSoulbound = {
     mintUtxo: Joi.object().optional(),
     claimUtxo: Joi.object().optional(),
     burnTx: Joi.string().optional(),
-    aikenCourseApproved: Joi.boolean().optional(),
+    aikenCourseApproved: Joi.string().valid("", "aprobado", "honores").optional(),
   }),
 };
 

@@ -28,9 +28,9 @@ cfgVars=(
   [CODE_MASTER]="2UzARDri17Gvf5JeItsaK2dizPtSm1Q87CZxTiWJkcU8eUf7WVElN6=="
   [REDIS_SOURCE]=heroku
   [REDIS_TTL]=3600
-  [FRONTEND_URL]="http://localhost:3000"
+  [FRONTEND_URL]="https://develop.adasouls.io"
   [COOKIE_SESSION_SECRET]="lF61oh8H3YhISpc9wd1q9VuWXd4HiEYLUmEsTe7w=="
-  [BLOCKFROST_API_KEY]="preprodHQwbvKLU7GHTmZfMifLlk9NBMq3JTDKV"
+  [BLOCKFROST_API_KEY]="preprodBOaS3qGjlzOEFxZ2vMl9KLF0yKxhU4hp"
 )
 
 

@@ -44,7 +44,7 @@ const signCollection = async (collectionId, user, signature) => {
   let collection = await models.Collection.findOne({ where: { collectionId: collectionId } });
   if (!collection) {
     console.log("Collection does not exist");
-    errorService.stashBadRequest('Soulbound collection not signed', 'not-signed');
+    errorService.stashNotFound('Soulbound collection does not exist', 'not-found');
     return false;
   }
   const index = collection.invited.findIndex(i => i.user == user && i.signature == "");
@@ -82,7 +82,7 @@ const getCollection = async (collectionId) => {
   });
   if (!collection) {
     console.log("Collection does not exist");
-    errorService.stashBadRequest('Collection does not exist', 'not-found');
+    errorService.stashNotFound('Soulbound collection does not exist', 'not-found');
     return false;
   }
   return collection;

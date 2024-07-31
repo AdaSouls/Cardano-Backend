@@ -82,6 +82,8 @@ const getCollection = async (collectionId) => {
   });
   if (!collection) {
     console.log("Collection does not exist");
+    errorService.stashBadRequest('Collection does not exist', 'not-found');
+    return false;
   }
   return collection;
 };

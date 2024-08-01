@@ -14,19 +14,19 @@
     "/users/login": {
       "post": {
         "tags": ["Users"],
-        "description": "API to manage user authentication. Verifies the Cardano wallet signature of a user.",
-        "operationId": "for the URL",
+        "description": "Verifies the Cardano wallet signature of a user.",
+        "operationId": "1",
         "produces": ["application/json"],
         "parameters": [
           {
-            "name": "Code",
-            "in": "params",
+            "name": "code",
+            "in": "query",
             "description": "Backend code",
             "required": true,
             "type": "string"
           },
           {
-            "name": "Signature Data",
+            "name": "sigData",
             "in": "body",
             "description": "Cardano wallet signature",
             "required": true,
@@ -45,11 +45,75 @@
         }
       }
     },
+    "/users/{stakeAddress}/collections/invited": {
+      "get": {
+        "tags": ["Users"],
+        "description": "Get collections a user has been invited as a signer.",
+        "operationId": "2",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "description": "Backend code",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "stakeAddress",
+            "in": "path",
+            "description": "User stake address",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of collections a user has been invited to as a signer",
+            "schema": {
+              "$ref": "#/definitions/collection"
+            }
+          }
+        }
+      }
+    },
+    "/users/{stakeAddress}/collections": {
+      "get": {
+        "tags": ["Collections"],
+        "description": "Get user collections.",
+        "operationId": "3",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "description": "Backend code",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "stakeAddress",
+            "in": "path",
+            "description": "User stake address",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of user collections",
+            "schema": {
+              "$ref": "#/definitions/collection"
+            }
+          }
+        }
+      }
+    },
     "/path/to/method/{someVariable}": {
       "delete": {
-        "tags": ["Tag1"],
+        "tags": ["Collections"],
         "description": "Deletes a something",
-        "operationId": "delete",
+        "operationId": "4",
         "produces": ["application/json"],
         "parameters": [
           {
@@ -72,7 +136,7 @@
       "get": {
         "tags": ["Tag1"],
         "description": "Returns the status of something",
-        "operationId": "findById",
+        "operationId": "5",
         "produces": ["application/json"],
         "parameters": [
           {
@@ -150,6 +214,122 @@
         "updatedAt": {
           "type": "timestamp",
           "example": "2024-07-19T10:01:43.373Z"
+        }
+      }
+    },
+    "collection": {
+      "properties": {
+        "collectionId": {
+          "type": "string",
+          "format": "uuid",
+          "example": "a1ad43dc-a89a-44fa-b8de-9f5dffa30c9f"
+        },
+        "owner": {
+          "type": "string",
+          "format": "stake address",
+          "example": "stake_test1upjcnnsfsz5jr9hugst8ul702g7xhc72znufacdk5th40fc9lwzs0"
+        },
+        "name": {
+          "type": "string",
+          "example": "Test#003"
+        },
+        "symbol": {
+          "type": "string",
+          "example": "$Test"
+        },
+        "description": {
+          "type": "string",
+          "example": "Test Collection"
+        },
+        "smartContract": {
+          "type": "string",
+          "example": "addr_test1wq5y2pmwmc6v436yde8rvdm3fvu6fh7vt7g4fysnl44t5mc4nu672"
+        },
+        "policyId": {
+          "type": "string",
+          "example": "a6d3348f5e13285a59f9d1e27c6d5fd9fac75f1432a55b13fbc508f2"
+        },
+        "policyHash": {
+          "type": "string",
+          "example": "665560ffcfa833489189779971c633ae1c017bee0b0801830eee033b51e7fb00"
+        },
+        "policy": {
+          "properties": {
+            "slot": {
+              "type": "number",
+              "example": null
+            },
+            "type": {
+              "type": "string",
+              "example": "All"
+            },
+            "keyHash": {
+              "type": "string",
+              "example": null
+            },
+            "require": {
+              "type": "string",
+              "example": null
+            },
+            "scripts": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/policy1"
+              }
+            },
+            "address": {
+              "type": "string",
+              "example": "addr1q9kmzcspgd4uezwvve3zddf05nz45v3gsefvf9zxqrpgdxnet4zhaqq30fefre0pgj6fdlgrqpv4753tvmyfrenvethsqskfke"
+            }
+          }
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "example": "2024-07-19T10:01:43.373Z"
+        },
+        "updatedAt": {
+          "type": "timestamp",
+          "example": "2024-07-19T10:01:43.373Z"
+        }
+      }
+    },
+    "policy1": {
+      "properties": {
+        "slot": {
+          "type": "number",
+          "example": null
+        },
+        "type": {
+          "type": "string",
+          "example": "Sig"
+        },
+        "keyHash": {
+          "type": "string",
+          "example": "9d4d78c412018bac8d6e6fd2bf8880cfc273d7af2e772290e1c02f10"
+        },
+        "require": {
+          "type": "string",
+          "example": null
+        }
+      }
+    },
+    "policy2": {
+      "properties": {
+        "slot": {
+          "type": "number",
+          "example": null
+        },
+        "type": {
+          "type": "string",
+          "example": "Sig"
+        },
+        "keyHash": {
+          "type": "string",
+          "example": "15feed19954cdd131bb8a2eddc2de2b79aa6263dbe3d8b01be383f27"
+        },
+        "require": {
+          "type": "string",
+          "example": null
         }
       }
     },

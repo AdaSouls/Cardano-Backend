@@ -110,11 +110,7 @@ else
   console.log('No --port=xxx specified, taking default port ' + port + '.')
 
 // Set and display the application URL
-if (config.env === "local") {
-  var applicationUrl = 'http://' + domain + ':' + port;
-} else {
-  var applicationUrl = 'https://' + domain + ':' + port;
-}
+var applicationUrl = 'http://' + domain + ':' + port;
 
 console.log('snapJob API running on ' + applicationUrl);
 

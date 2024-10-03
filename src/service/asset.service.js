@@ -11,13 +11,14 @@ module.exports = {
   syncNftAsset,
   deleteNftAsset,
   flushAssetListCaches,
+  getPinataImageUrl,
 };
 
 
 const models = require("../model");
 const errorService = require("./error.service");
 const config = require('../config/config');
-
+const { PinataSDK } = require("pinata");
 /*
 |--------------------------------------------------------------------------
 | NFT assets, basic CRUD support.
@@ -206,4 +207,20 @@ async function delCachedNftAssetList() {
   } catch (e) {
     return false;
   }
+}
+
+async function getPinataImageUrl(ipfsUri) {
+
+  const pinata = new PinataSDK({
+    pinataJwt: config.pinata.jwt,
+    pinataGateway: config.pinata.gateway,
+  });
+
+  const url = await pinata.gateways.createSignedURL({
+      cid: ipfsUri,
+    expires: 1800,
+  })
+
+  return url;
+
 }

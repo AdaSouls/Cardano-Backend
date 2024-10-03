@@ -34,6 +34,12 @@ const deleteNftAsset = {
   }
 };
 
+const getPinataImage = {
+  params: {
+    ipfsUri: Joi.string().required(),
+  }
+}
+
 /*
 |--------------------------------------------------------------------------
 | Exports.
@@ -44,4 +50,5 @@ module.exports = {
   getNftAssetByAddress,
   syncNftAsset,
   deleteNftAsset,
+  getPinataImage,
 };

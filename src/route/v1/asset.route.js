@@ -10,5 +10,6 @@ router.route("/nft/get/:address").get(validate(assetValidation.getNftAssetByAddr
 router.route("/nft/sync").post(validate(assetValidation.syncNftAsset), assetController.syncNftAsset);
 router.route("/nft/delete/:address").delete(validate(assetValidation.deleteNftAsset), assetController.deleteNftAsset);
 router.route("/flushCache").post(assetController.flushCaches);
+router.route("/getPinataImage/:ipfsUri").post(validate(assetValidation.getPinataImage), assetController.getPinataImage);
 
 module.exports = router;

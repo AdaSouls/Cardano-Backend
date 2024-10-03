@@ -63,5 +63,10 @@ module.exports = {
   },
   jwt: {
     sessionSecret: envVars.COOKIE_SESSION_SECRET,
+  },
+  pinata: {
+    gateway: envVars.PINATA_GATEWAY_DOMAIN,
+    gatewayKey: envVars.PINATA_GATEWAY_KEY,
+    jwt: envVars.PINATA_JWT,
   }
 };

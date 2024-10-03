@@ -506,64 +506,6 @@ const web2BulkGift = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send();
 });
 
-
-/*
-|--------------------------------------------------------------------------
-| Fake Web3.
-|--------------------------------------------------------------------------
-*/
-
-/**
- * Turn fake web3 ON for an asset instance.
- */
-const fakeWeb3On = catchAsync(async (req, res) => {
-  if (!codeService.checkCode(req, "fakeWeb3On")) {
-    errorService.emitStashedError(res);
-    return;
-  }
-
-  const options = {
-    userId: req.params.userId,
-    assetInstanceId: req.params.assetInstanceId,
-    on: true,
-  };
-
-  const resp = await assetService.fakeWeb3(options);
-
-  if (resp === false) {
-    errorService.emitStashedError(res);
-    return;
-  }
-
-  res.status(httpStatus.OK).send();
-});
-
-/**
- * Turn fake web3 OFF for an asset instance.
- */
-const fakeWeb3Off = catchAsync(async (req, res) => {
-  if (!codeService.checkCode(req, "fakeWeb3Off")) {
-    errorService.emitStashedError(res);
-    return;
-  }
-
-  const options = {
-    userId: req.params.userId,
-    assetInstanceId: req.params.assetInstanceId,
-    on: false,
-  };
-
-  const resp = await assetService.fakeWeb3(options);
-
-  if (resp === false) {
-    errorService.emitStashedError(res);
-    return;
-  }
-
-  res.status(httpStatus.OK).send();
-});
-
-
 /*
 |--------------------------------------------------------------------------
 | REDIS cache management.
@@ -614,6 +556,31 @@ const restartNftMonitoring = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send({ status: "ok" });
 });
 
+/**
+ * Gets access, for a limited amount of time, to pinata gateway to
+ * to retrieve an IPFS image url.
+ */
+const getPinataImage = catchAsync(async (req, res) => {
+  if (!codeService.checkCode(req, 'getPinataImage')) {
+    errorService.emitStashedError(res);
+    return;
+  }
+
+  const ipfsUri = req.params.ipfsUri;
+
+  const url = await assetService.getPinataImageUrl(ipfsUri);
+
+  if (url === false) {
+    errorService.emitStashedError(res);
+    return;
+  }
+
+  res.status(httpStatus.OK).send({
+    status: "ok",
+    url
+  });
+});
+
 
 /*
 |--------------------------------------------------------------------------
@@ -649,10 +616,10 @@ module.exports = {
   deleteUserWeb2AssetAllPromo,
   web2BulkGift,
 
-  fakeWeb3On,
-  fakeWeb3Off,
-
   flushCaches,
 
   restartNftMonitoring,
+
+  getPinataImage,
+
 };

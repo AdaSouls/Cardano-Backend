@@ -52,6 +52,7 @@
     "minimist": "*",
     "morgan": "^1.9.1",
     "pg": "^8.11.3",
+    "pinata": "^1.4.1",
     "pm2": "^5.1.0",
     "redis": "^4.6.13",
     "rsa-pem-from-mod-exp": "^0.8.6",

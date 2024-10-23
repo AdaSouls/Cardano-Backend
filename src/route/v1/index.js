@@ -8,7 +8,6 @@ const walletRoute = require("./wallet.route");
 const healthCheckRoute = require('./healthCheck.route');
 const userRoute = require('./user.route');
 const spoRoute = require('./spo.route');
-const soulboundRoute = require('./soulbound.route');
 const webhookRoute = require("./webhook.route");
 
 const defaultRoutes = [
@@ -23,10 +22,6 @@ const defaultRoutes = [
   {
     path: "/collections",
     route: collectionRoute,
-  },
-  {
-    path: "/soulbound",
-    route: soulboundRoute,
   },
   {
     path: '/healthCheck',

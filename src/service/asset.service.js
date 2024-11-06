@@ -19,6 +19,8 @@ const models = require("../model");
 const errorService = require("./error.service");
 const config = require('../config/config');
 const { PinataSDK } = require("pinata");
+const axios = require('axios');
+
 /*
 |--------------------------------------------------------------------------
 | NFT assets, basic CRUD support.
@@ -211,16 +213,32 @@ async function delCachedNftAssetList() {
 
 async function getPinataImageUrl(ipfsUri) {
 
-  const pinata = new PinataSDK({
-    pinataJwt: config.pinata.jwt,
-    pinataGateway: config.pinata.gateway,
-  });
+  try {
+    const pinata = new PinataSDK({
+      pinataJwt: config.pinata.jwt,
+      pinataGateway: config.pinata.gateway,
+    });
 
-  const url = await pinata.gateways.createSignedURL({
+    const url = await pinata.gateways.createSignedURL({
       cid: ipfsUri,
-    expires: 1800,
-  })
+      expires: 3600,
+    })
 
-  return url;
+    const resp = await axios.get(url);
+
+    console.log(resp);
+
+    if (resp.status === 200) {
+      return url;
+    }
+  } catch (e) {
+    if (e.response.data.status === 500 && e.response.data.error === "cid not found") {
+      return null;
+    } else {
+      console.log("Svc:Assets:getPinataImageUrl error", e);
+      errorService.stashInternalErrorFromException(e, "Svc:Assets:getPinataImageUrl: ");
+      return false;
+    }
+  }
 
 }

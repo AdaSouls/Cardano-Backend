@@ -575,10 +575,19 @@ const getPinataImage = catchAsync(async (req, res) => {
     return;
   }
 
+  if (url === null) {
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+      status: "not ok",
+      url: null
+    });
+    return;
+  }
+
   res.status(httpStatus.OK).send({
     status: "ok",
     url
   });
+
 });
 
 

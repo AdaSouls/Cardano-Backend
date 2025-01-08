@@ -48,6 +48,7 @@ module.exports = {
   },
   web3: {
     blockfrost: {
+      secretAuthToken: envVars.BLOCKFROST_SECRET_AUTH_TOKEN,
       apiKey: envVars.BLOCKFROST_API_KEY,
     },
   },

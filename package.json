@@ -31,6 +31,7 @@
   ],
   "dependencies": {
     "@blockfrost/blockfrost-js": "^5.5.0",
+    "@dcspark/cardano-multiplatform-lib-nodejs": "^6.0.1",
     "@emurgo/cardano-message-signing-nodejs": "^1.0.1",
     "@emurgo/cardano-serialization-lib-nodejs": "^11.5.0",
     "axios": "^1.4.0",

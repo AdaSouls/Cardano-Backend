@@ -23,6 +23,7 @@ module.exports = {
   env: envVars.NODE_ENV,
   port: envVars.PORT,
   frontendUrl: envVars.FRONTEND_URL,
+  frontendUrl2: envVars.FRONTEND_URL2,
   db: {
     migrations: envVars.DB_MIGRATION || 'pending',
     sync: envVars.DB_SYNC || 'none',

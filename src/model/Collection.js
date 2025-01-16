@@ -63,6 +63,7 @@ module.exports = function (sequelize) {
     description: {
       type: DataTypes.STRING(500),
       allowNull: true,
+      defaultValue: "",
     },
     smartContract: {
       type: DataTypes.STRING(64),

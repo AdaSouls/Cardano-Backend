@@ -31,8 +31,8 @@ const addUserCollection = {
   }),
   body: Joi.object().keys({
     name: Joi.string().required(),
-    symbol: Joi.string().optional(),
-    description: Joi.string().optional(),
+    symbol: Joi.string().required(),
+    description: Joi.string().required(),
     smartContract: Joi.string().required(),
     policyId: Joi.string().required(),
     policyHash: Joi.string().required(),
